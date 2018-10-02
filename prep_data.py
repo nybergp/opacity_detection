@@ -81,8 +81,8 @@ class ToTensor(object):
         return {'image': torch.from_numpy(image),
                 'pneumonia': pneumonia}
 
-trainset = PneumoniaDataset(csv_file='datasets/png_labels.csv',
-                                           root_dir='datasets/stage_1_small_png',
+trainset = PneumoniaDataset(csv_file='data/img_labels.csv',
+                                           root_dir='datasets/images',
                                            transform=transforms.Compose([
                                            RandomCrop(32), ToTensor()])
                             )
