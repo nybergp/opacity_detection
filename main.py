@@ -60,3 +60,9 @@ if __name__ == '__main__':
             running_loss += loss.item()
             print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
+
+# save state of network as net.pth
+torch.save(net.state_dict(), './net.pth')
+
+# load state of network
+#net.load_state_dict(torch.load('./net.pth'))

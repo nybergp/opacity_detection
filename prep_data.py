@@ -82,7 +82,7 @@ class ToTensor(object):
                 'pneumonia': pneumonia}
 
 trainset = PneumoniaDataset(csv_file='data/img_labels.csv',
-                                           root_dir='datasets/images',
+                                           root_dir='data/images',
                                            transform=transforms.Compose([
                                            RandomCrop(32), ToTensor()])
                             )
