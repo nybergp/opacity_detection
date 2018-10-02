@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 class Net(nn.Module):
     def __init__(self):
@@ -15,7 +16,7 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(3, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.fc3 = nn.Linear(84, 1)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -23,7 +24,7 @@ class Net(nn.Module):
         x = x.view(-1, 16 * 5 * 5)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = F.softmax(self.fc3(x))
         return x
 
 net = Net()
@@ -33,7 +34,7 @@ net = Net()
 
 import torch.optim as optim
 
-criterion = nn.CrossEntropyLoss()
+criterion = nn.BCELoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 ########################################################################
@@ -46,11 +47,15 @@ if __name__ == '__main__':
             # get the inputs
             inputs, labels = data['image'].type('torch.FloatTensor'), data['pneumonia']
 
+            print(inputs.shape)
+
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # forward + backward + optimize
             outputs = net(inputs)
+
+            labels = labels.type(torch.FloatTensor)
 
             loss = criterion(outputs, labels)
             loss.backward()
