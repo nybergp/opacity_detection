@@ -5,6 +5,10 @@ from skimage import io, transform
 import os
 import torch
 import numpy as np
+import pydicom as pyd
+
+# dcm or jpg
+image_type = 'dcm'
 
 class PneumoniaDataset(Dataset):
     """Pneumonia opacity dataset"""
@@ -25,12 +29,11 @@ class PneumoniaDataset(Dataset):
         return len(self.pneumonia_frame)
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir,
-                                self.pneumonia_frame.iloc[idx, 0] + '.jpg')
-        image = io.imread(img_name, as_gray=True)
+        img_name = os.path.join(self.root_dir, self.pneumonia_frame.iloc[idx, 0] + '.' + image_type)
+
+        image = io.imread(img_name) if image_type == 'jpg' else pyd.dcmread(img_name).pixel_array
         image = np.expand_dims(image, 2)
         pneumonia = self.pneumonia_frame.iloc[idx, 1:].values
-        #pneumonia = pneumonia.astype('float')#.reshape(1, 1)
 
         sample = {'image': image, 'pneumonia': pneumonia[0]}
 
@@ -82,7 +85,7 @@ class ToTensor(object):
                 'pneumonia': pneumonia}
 
 trainset = PneumoniaDataset(csv_file='data/img_labels.csv',
-                                           root_dir='data/images',
+                                           root_dir='data/images_' + image_type,
                                            transform=transforms.Compose([
                                            RandomCrop(32), ToTensor()])
                             )
